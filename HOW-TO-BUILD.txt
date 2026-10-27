@@ -1,0 +1,38 @@
+Give Me the Bible Word Search: iPhone and iPad (and Apple-silicon Mac) build
+============================================================================
+
+This folder is a ready-made Xcode project. An .ipa file can only be produced and signed on a Mac with
+Xcode and your own Apple Developer account, so the final step has to happen on your Mac.
+
+What you need
+- A Mac with Xcode 15 or newer (free from the Mac App Store).
+- An Apple ID. A free Apple ID can install the app on your own iPhone/iPad for 7 days at a time.
+  The paid Apple Developer Program ($99/year) is needed for permanent installs, TestFlight and the App Store.
+
+Steps
+1. Unzip this folder and double-click GiveMeTheBibleWordSearch.xcodeproj to open it in Xcode.
+2. Click the project in the left sidebar, choose the "GiveMeTheBibleWordSearch" target, open
+   "Signing & Capabilities", tick "Automatically manage signing" and pick your Team (your Apple ID).
+   If Xcode says the bundle identifier is taken, change com.kjv.givemethebiblewordsearch to something unique,
+   e.g. com.yourname.givemethebiblewordsearch.
+3. To try it: plug in your iPhone or iPad, choose it at the top of the window and press Run (the play button).
+   (On the device, the first time: Settings > General > VPN & Device Management > trust your developer profile.
+   iOS 16+ also needs Settings > Privacy & Security > Developer Mode turned on.)
+4. To make the .ipa / publish: choose "Any iOS Device (arm64)" at the top, then Product > Archive.
+   In the Organizer window press "Distribute App" and pick App Store Connect (App Store / TestFlight),
+   Ad Hoc (an .ipa for registered devices) or Development.
+
+iMac / Mac
+- Apple-silicon Macs (M1 and newer) can run this same iPhone/iPad app ("Designed for iPad"):
+  in Xcode choose "My Mac (Designed for iPad)" and press Run; on the App Store it can be offered to Mac users too.
+- For any Mac, including Intel iMacs, use the separate macOS app included with this release
+  (GiveMeTheBibleWordSearch-macOS-AppleSilicon.zip or -Intel.zip). No Xcode needed.
+
+What the iOS wrapper does
+- Shows the bundled app (the www folder) full screen. Everything works offline.
+- Print uses the iOS print sheet; exporting highlights opens "Save to Files"; Share opens the share sheet.
+- Exit: Apple does not allow apps to close themselves, so Exit saves your progress and returns to the title screen.
+- Progress is stored on the device per player, the same as on Android and Windows.
+
+Note: this project was written without access to a Mac, so it has not been compiled or run on an iPhone yet.
+If Xcode shows an error, copy its message and send it, and it can be fixed.
