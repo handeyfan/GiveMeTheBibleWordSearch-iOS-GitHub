@@ -30,7 +30,10 @@ button { cursor: pointer; }
 
 .app { position: fixed; inset: 0; display: flex; }
 .gilt { width: 8px; flex: none; background: repeating-linear-gradient(180deg, var(--gilt) 0 2px, var(--gilt-hi) 2px 3px, var(--gilt) 3px 5px); box-shadow: inset -1px 0 0 rgba(0,0,0,.18); }
-.screen { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow: hidden; padding-top: env(safe-area-inset-top); }
+:root { --sat: env(safe-area-inset-top, 0px); --sar: env(safe-area-inset-right, 0px); --sab: env(safe-area-inset-bottom, 0px); --sal: env(safe-area-inset-left, 0px); }
+/* Edge to edge: the app's own colours run under the notch and home bar; content stays clear of them. */
+.app { padding-left: var(--sal); padding-right: var(--sar); background: var(--page); }
+.screen { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow: hidden; padding-top: var(--sat); padding-bottom: var(--sab); }
 
 /* ---------- top bar ---------- */
 .bar { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--rule); background: var(--leaf); flex: none; }
@@ -239,7 +242,7 @@ table.rec .d { font-size: .8em; color: var(--ink-soft); }
 :root[data-theme="dark"] .mark-lavender { background: rgba(130, 115, 175, .45) !important; }
 .mark-gray { background: rgba(190, 192, 198, .5) !important; }
 :root[data-theme="dark"] .mark-gray { background: rgba(105, 110, 120, .45) !important; }
-.selbar { position: sticky; bottom: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 10px 14px calc(10px + env(safe-area-inset-bottom)); background: var(--leaf); border-top: 2px solid var(--gilt); box-shadow: 0 -6px 20px rgba(0,0,0,.12); }
+.selbar { position: sticky; bottom: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 10px 14px 10px; background: var(--leaf); border-top: 2px solid var(--gilt); box-shadow: 0 -6px 20px rgba(0,0,0,.12); }
 .selbar > span { flex: 1; min-width: 120px; }
 .swatches button { min-width: 96px; display: inline-flex; align-items: center; gap: 8px; }
 .swatches button i { width: 18px; height: 18px; border-radius: 50%; border: 1px solid rgba(0,0,0,.25); display: inline-block; }
@@ -279,11 +282,69 @@ table.rec .d { font-size: .8em; color: var(--ink-soft); }
 
 /* ---------- Poppy Egg Studio: start screen and menu footer ---------- */
 .start { position: fixed; inset: 0; z-index: 100; background: #FFC21A; display: grid; place-items: center; cursor: pointer; transition: opacity .4s ease; outline: none;
-  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
-.start picture, .start img { display: block; width: 100%; height: 100%; }
+  padding: var(--sat) var(--sar) var(--sab) var(--sal); }
+.start picture { position: absolute; top: var(--sat); right: var(--sar); bottom: var(--sab); left: var(--sal); display: block; }
+.start img { display: block; width: 100%; height: 100%; }
 .start img { object-fit: contain; }
 .start.out { opacity: 0; pointer-events: none; }
 .studio { margin-top: 26px; padding-top: 18px; border-top: 1px solid var(--rule); text-align: center; }
 .studio img { display: block; width: min(210px, 60%); height: auto; margin: 0 auto 8px; }
 .studio p { margin: 0; font-size: .8em; color: var(--ink-soft); }
 #print-root .pcopy { margin-top: 10pt; font-size: 8pt; color: #444; text-align: center; }
+
+/* Phone held sideways: a slim top bar leaves more height for the grid. */
+@media (max-height: 500px) and (orientation: landscape) {
+  .bar { padding: 3px 8px; gap: 5px; }
+  .bar h1 { font-size: 1em; }
+  .bar .sub { font-size: .72em; }
+  .bar .btn { min-height: 34px; padding: 4px 8px; }
+  .bar .btn.icon, .bar .btn:has(.lbl) { width: 36px; min-width: 36px; padding: 4px; }
+  .bar .btn .lbl, .bar .hide-narrow { display: none; }
+  .bar .btn svg { width: 20px; height: 20px; }
+  .ws .zoom { flex-direction: column; }
+  .ws .boardwrap { height: auto; min-height: 0; }
+}
+
+/* ---------- title/menu screen: centered, and two columns when the screen is wider than tall ---------- */
+.title-screen { display: flex; padding: 24px 18px; }
+.title-card { margin: auto; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-areas: "head" "menu" "info"; }
+.tc-head { grid-area: head; text-align: center; }
+.tc-menu { grid-area: menu; }
+.tc-info { grid-area: info; text-align: center; }
+.title-screen .title-mark { margin-bottom: 18px; }
+.title-screen .who { justify-content: center; }
+.title-foot { justify-content: center; }
+@media (orientation: landscape) and (min-width: 640px) {
+  .title-card { width: min(1040px, 100%); grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "head menu" "info menu"; column-gap: clamp(24px, 5vw, 64px); align-items: center; }
+  .tc-head { align-self: end; }
+  .tc-info { align-self: start; }
+  .tc-info .verse-of-day { margin-top: 10px; }
+  .tc-menu .title-foot { margin-top: 12px; }
+}
+/* Phone held sideways: smaller logo and title, tighter buttons; the menu scrolls on its own if needed. */
+@media (orientation: landscape) and (max-height: 520px) {
+  .title-screen { padding: 10px 16px; overflow: hidden; }
+  .title-card { height: 100%; grid-template-rows: auto minmax(0, 1fr); }
+  .tc-menu { height: 100%; overflow: auto; padding: 4px 2px; }
+  .title-screen .title-mark { --t: 22px; --g: 3px; padding: 8px; margin-bottom: 8px; }
+  .title-mark .st { font-size: 13px; }
+  .title-screen h1 { font-size: 2rem; }
+  .title-screen .tag { font-size: 1em; margin-bottom: 8px; }
+  .title-screen .who { margin: 0 0 6px; font-size: .85em; }
+  .menu-list { gap: 6px; }
+  .menu-list .btn { min-height: 38px; padding: 4px 12px; }
+  .menu-list .btn small { display: none; }
+  .tc-menu .title-foot { margin-top: 8px; }
+  .tc-menu .title-foot .btn { min-height: 36px; }
+  .tc-info .verse-of-day { display: none; }
+  .tc-head, .tc-info { min-height: 0; }
+  .studio { margin-top: 10px; padding-top: 10px; }
+  .studio img { width: 130px; margin-bottom: 4px; }
+  .studio p { font-size: .7em; }
+}
+@media (orientation: landscape) and (max-height: 400px) {
+  .menu-list { gap: 4px; }
+  .menu-list .btn { min-height: 34px; padding: 3px 12px; font-size: .95em; }
+  .tc-menu .title-foot { margin-top: 6px; }
+  .tc-menu .title-foot .btn { min-height: 32px; }
+}

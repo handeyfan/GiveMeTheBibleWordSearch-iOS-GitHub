@@ -35,11 +35,13 @@ final class GameViewController: UIViewController, WKScriptMessageHandler, WKNavi
         root.backgroundColor = paper
         root.addSubview(webView)
         webView.translatesAutoresizingMaskIntoConstraints = false
+        // Edge to edge: the page fills the whole screen and keeps its content clear of the notch and
+        // home bar itself (CSS env(safe-area-inset-*), with viewport-fit=cover in index.html).
         NSLayoutConstraint.activate([
-            webView.leadingAnchor.constraint(equalTo: root.safeAreaLayoutGuide.leadingAnchor),
-            webView.trailingAnchor.constraint(equalTo: root.safeAreaLayoutGuide.trailingAnchor),
-            webView.topAnchor.constraint(equalTo: root.safeAreaLayoutGuide.topAnchor),
-            webView.bottomAnchor.constraint(equalTo: root.safeAreaLayoutGuide.bottomAnchor)
+            webView.leadingAnchor.constraint(equalTo: root.leadingAnchor),
+            webView.trailingAnchor.constraint(equalTo: root.trailingAnchor),
+            webView.topAnchor.constraint(equalTo: root.topAnchor),
+            webView.bottomAnchor.constraint(equalTo: root.bottomAnchor)
         ])
         view = root
     }
@@ -57,7 +59,8 @@ final class GameViewController: UIViewController, WKScriptMessageHandler, WKNavi
         webView.evaluateJavaScript("window.onAndroidPause && window.onAndroidPause()", completionHandler: nil)
     }
 
-    override var prefersStatusBarHidden: Bool { false }
+    // Full screen: the clock/battery bar is hidden while the app is open.
+    override var prefersStatusBarHidden: Bool { true }
     override var preferredStatusBarStyle: UIStatusBarStyle { .darkContent }
 
     // MARK: - Messages from the page

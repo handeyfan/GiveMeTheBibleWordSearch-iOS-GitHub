@@ -201,10 +201,10 @@
       '<div class="srow">' + tiles('THE') + '<span class="ssp"></span><span class="sfound">' + tiles('BIBLE') + '</span></div>';
     screen.innerHTML =
       '<div class="title-screen"><div class="title-card">' +
-      '<div class="title-mark" aria-hidden="true">' + markHtml + '</div>' +
+      '<div class="tc-head"><div class="title-mark" aria-hidden="true">' + markHtml + '</div>' +
       '<h1><small>Give Me the Bible</small>Word Search</h1><p class="tag">King James Version</p>' +
-      '<div class="who">' + I.user + '<span>Playing as <b>' + esc(profileName()) + '</b></span><button class="btn quiet" data-go="profiles">Switch player</button></div>' +
-      '<nav class="menu-list">' +
+      '<div class="who">' + I.user + '<span>Playing as <b>' + esc(profileName()) + '</b></span><button class="btn quiet" data-go="profiles">Switch player</button></div></div>' +
+      '<div class="tc-menu"><nav class="menu-list">' +
       (recent ? '<button class="btn primary" data-go="continue"><span>Continue puzzle<small>' + esc(recent.title) + ' – ' + Math.round((recent.pct || 0) * 100) + '% found</small></span></button>' : '') +
       '<button class="btn ' + (recent ? '' : 'primary') + '" data-go="library"><span>Puzzle library<small>200 themed puzzles from Genesis to Revelation, 20–25 words each</small></span></button>' +
       '<button class="btn" data-go="random"><span>New random puzzle<small>Choose the theme and how many words – a new puzzle every time</small></span></button>' +
@@ -215,9 +215,10 @@
       '<button class="btn" data-go="settings"><span>Settings<small>Difficulty, highlighter colours, text size, reset</small></span></button>' +
       '</nav>' +
       '<div class="title-foot">' +
-      '<button class="btn" data-act="exit">' + I.exit + '<span class="lbl">Exit</span></button></div>' +
+      '<button class="btn" data-act="exit">' + I.exit + '<span class="lbl">Exit</span></button></div></div>' +
+      '<div class="tc-info">' +
       '<div class="verse-of-day">“' + esc(vd[3]) + '”<cite>' + vd[0] + ' ' + vd[1] + ':' + vd[2] + '</cite></div>' +
-      '<footer class="studio"><img src="img/poppyegg-logo.png" alt="Poppy Egg Studio" width="900" height="543"><p>© 2026 Poppy Egg Studio LLC. All rights reserved.</p></footer>' +
+      '<footer class="studio"><img src="img/poppyegg-logo.png" alt="Poppy Egg Studio" width="900" height="543"><p>© 2026 Poppy Egg Studio LLC. All rights reserved.</p></footer></div>' +
       '</div></div>';
     wireBar();
     screen.querySelectorAll('[data-go]').forEach((b) => (b.onclick = () => {
@@ -820,11 +821,13 @@
     const dpr = window.devicePixelRatio || 1; const bw = $('#bw');
     return { vw: Math.floor(bw.clientWidth * dpr), vh: Math.floor(bw.clientHeight * dpr) };
   };
+  // Grid above the word list (phones held upright): zoom buttons sit in a strip under the grid.
+  const stackedLayout = () => window.matchMedia('(max-width: 860px)').matches && !window.matchMedia('(max-height: 520px) and (orientation: landscape)').matches;
   Game.prototype.fitCells = function () {
     const bw = $('#bw'); if (!bw) return;
     let px = this.cellPx;
     if (!px) {
-      const narrow = window.matchMedia('(max-width: 860px)').matches; // phones keep a strip below the grid for the zoom buttons
+      const narrow = stackedLayout(); // phones keep a strip below the grid for the zoom buttons
       const avail = Math.min(bw.clientWidth - (narrow ? 8 : 20), bw.clientHeight - (narrow ? 50 : 20)) - 8 - (this.n - 1);
       px = Math.floor(avail / this.n);
       px = Math.max(16, Math.min(60, px));
@@ -847,14 +850,14 @@
   Game.prototype.zoom = function (f) { this.setCell(this.cellPx * f); store.set(zoomKey(), this.cellPx); };
   Game.prototype.centerGrid = function () {
     const g = this.geom(), v = this.viewSize();
-    const narrow = window.matchMedia('(max-width: 860px)').matches;
+    const narrow = stackedLayout();
     this.panX = Math.round((v.vw - g.size) / 2); this.panY = narrow ? Math.round(4 * g.dpr) : Math.round((v.vh - g.size) / 2);
     this.clampPan();
   };
   Game.prototype.clampPan = function () {
-    const g = this.geom(), v = this.viewSize(), m = Math.round((window.matchMedia('(max-width: 860px)').matches ? 4 : 10) * g.dpr);
+    const g = this.geom(), v = this.viewSize(), m = Math.round((stackedLayout() ? 4 : 10) * g.dpr);
     if (g.size + 2 * m <= v.vw) this.panX = Math.round((v.vw - g.size) / 2); else this.panX = Math.min(m, Math.max(v.vw - g.size - m, this.panX));
-    if (g.size + 2 * m <= v.vh) this.panY = window.matchMedia('(max-width: 860px)').matches ? Math.round(4 * g.dpr) : Math.round((v.vh - g.size) / 2); else this.panY = Math.min(m, Math.max(v.vh - g.size - m, this.panY));
+    if (g.size + 2 * m <= v.vh) this.panY = stackedLayout() ? Math.round(4 * g.dpr) : Math.round((v.vh - g.size) / 2); else this.panY = Math.min(m, Math.max(v.vh - g.size - m, this.panY));
     this.panX = Math.round(this.panX); this.panY = Math.round(this.panY);
   };
   Game.prototype.snapCanvas = function () {
