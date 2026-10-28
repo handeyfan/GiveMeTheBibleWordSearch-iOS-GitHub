@@ -217,6 +217,7 @@
       '<div class="title-foot">' +
       '<button class="btn" data-act="exit">' + I.exit + '<span class="lbl">Exit</span></button></div>' +
       '<div class="verse-of-day">“' + esc(vd[3]) + '”<cite>' + vd[0] + ' ' + vd[1] + ':' + vd[2] + '</cite></div>' +
+      '<footer class="studio"><img src="img/poppyegg-logo.png" alt="Poppy Egg Studio" width="900" height="543"><p>© 2026 Poppy Egg Studio LLC. All rights reserved.</p></footer>' +
       '</div></div>';
     wireBar();
     screen.querySelectorAll('[data-go]').forEach((b) => (b.onclick = () => {
@@ -373,7 +374,7 @@
       '<div class="field"><span class="lab">Text size</span>' + seg('size', settings.size, [['normal', 'Normal'], ['large', 'Large'], ['xlarge', 'Extra large']]) + '</div></div>' +
       '<div class="panel"><h2>Reset</h2><p class="help" style="margin-top:0">These affect only ' + esc(profileName()) + '. Other players are not changed.</p>' +
       '<div class="btnrow"><button class="btn" id="resetGame">Reset the entire game</button><button class="btn" id="resetHl">Delete all highlights</button><button class="btn" id="players">' + I.user + '<span>Manage players</span></button></div></div>' +
-      '<div class="panel"><h2>About</h2><p>Give Me the Bible Word Search 1.0.1. Scripture: King James Version, the 66 books of the Old and New Testaments. Fonts: Atkinson Hyperlegible and EB Garamond (SIL Open Font License).</p>' +
+      '<div class="panel"><h2>About</h2><p>Give Me the Bible Word Search 1.0.2. © 2026 Poppy Egg Studio LLC. All rights reserved.</p><p>Scripture: King James Version, the 66 books of the Old and New Testaments. Fonts: Atkinson Hyperlegible and EB Garamond (SIL Open Font License).</p>' +
       '</div>' +
       '</div></div>';
     wireBar(back);
@@ -709,7 +710,7 @@
     const pass = puz.passages && puz.passages.length ? '<p class="psub">Theme passages: ' + puz.passages.map(passStr).join('; ') + '</p>' : '';
     const list = puz.words.slice().sort((a, b) => a.a < b.a ? -1 : 1).map((w) => '<li><span class="box"></span><b>' + w.a + '</b> <i>' + esc(refStr(w.ref)) + '</i></li>').join('');
     root.innerHTML = '<h1>' + esc(puz.title) + (withAnswers ? ' – Answer key' : '') + '</h1><p class="psub">Give Me the Bible Word Search – King James Version – ' + esc(LEVELS[puz.level || 'hard'].name) + ' – ' + plural(puz.words.length, 'word') + '</p>' + pass + g +
-      '<ol class="pwords">' + list + '</ol>';
+      '<ol class="pwords">' + list + '</ol><p class="pcopy">© 2026 Poppy Egg Studio LLC. All rights reserved.</p>';
     setTimeout(doPrint, 60);
   }
 
@@ -1108,8 +1109,27 @@
   window.addEventListener('beforeunload', () => { if (game && !game.done) game.persist(); });
   window.addEventListener('resize', () => { if (game && current && current.view === 'puzzle' && document.getElementById('grid')) { if (!store.get(zoomKey(), 0)) { game.cellPx = 0; game.fitCells(); } else { game.clampPan(); game.draw(); } } });
 
+  // ---------- start screen (Poppy Egg Studio presents) ----------
+  // Shown once each time the app opens; tap, click or press a key to skip.
+  function startScreen(done) {
+    const el = document.createElement('div'); el.className = 'start'; el.setAttribute('role', 'button'); el.tabIndex = 0;
+    el.setAttribute('aria-label', 'Poppy Egg Studio presents. Tap to start.');
+    el.innerHTML = '<picture><source media="(max-aspect-ratio: 1/1)" srcset="img/poppyegg-start-tall.png">' +
+      '<img src="img/poppyegg-start-wide.png" alt=""></picture>';
+    document.body.appendChild(el); el.focus();
+    let gone = false;
+    const finish = () => {
+      if (gone) return; gone = true; clearTimeout(timer); document.removeEventListener('keydown', onKey, true);
+      done(); el.classList.add('out'); setTimeout(() => el.remove(), 450);
+    };
+    const onKey = (e) => { e.preventDefault(); finish(); };
+    const timer = setTimeout(finish, 3000);
+    el.addEventListener('click', finish); document.addEventListener('keydown', onKey, true);
+  }
+
   // boot
   go('title', {}, true);
+  if (!/[?&]nostart\b/.test(location.search)) startScreen(() => { const b = document.querySelector('.menu-list .btn'); if (b) b.focus({ preventScroll: true }); });
   setTimeout(() => loadKJV().catch(() => {}), 600);
   window.__ws = { go, get settings() { return settings; }, get game() { return game; }, switchProfile, printPuzzle, openPremade, makeRandom };
 })();
