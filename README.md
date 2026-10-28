@@ -6,3 +6,5 @@ Install it on your iPhone or iPad with Sideloadly (Windows or Mac) or AltStore, 
 Free Apple ID installs must be refreshed every 7 days.
 
 Build method adapted from github.com/adro0303/ipa-builder (MIT).
+
+© 2026 Poppy Egg Studio LLC. All rights reserved.
